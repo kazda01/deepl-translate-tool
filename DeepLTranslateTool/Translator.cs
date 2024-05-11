@@ -1,4 +1,5 @@
 using DeepLTranslateTool.Adapters;
+using DeepLTranslateTool.Exceptions;
 using DeepLTranslateTool.Models;
 
 namespace DeepLTranslateTool;
@@ -22,22 +23,18 @@ public class Translator
 
     public void Translate()
     {
-        var queries = _adapter.ParseInput(out var success);
+        var queries = _adapter.ParseInput();
         if (_verbose)
             Console.WriteLine($"Parsed {queries.Count()} queries from input file.");
-        if (!success)
-            return;
 
         var results = new List<TranslationResult>();
         // TODO: Implement translation logic
         if (_verbose)
             Console.WriteLine($"Translated {results.Count} queries to {_languages.Count()} languages.");
 
-        if (_adapter.WriteOutput(results))
-        {
-            if (_verbose)
-                Console.WriteLine("Translation complete.");
-        }
+        _adapter.WriteOutput(results);
+        if (_verbose)
+            Console.WriteLine("Translation complete.");
     }
 
     private async Task<IEnumerable<string>> ParseLanguages(IEnumerable<string> languages)
@@ -52,11 +49,11 @@ public class Translator
                 languageCodes.Add(language);
                 continue;
             }
-            throw new Exception($"Target language '{language}' not found. To see a list of supported languages, use the `list-languages` command.");
+            throw new TranslatorInitializationException($"Target language '{language}' not found. To see a list of supported languages, use the `list-languages` command.");
         }
 
         if (!languageCodes.Any())
-            throw new Exception("No valid target languages found. To see a list of supported languages, use the `list-languages` command.");
+            throw new TranslatorInitializationException("No valid target languages found. To see a list of supported languages, use the `list-languages` command.");
 
         if (_verbose)
             Console.WriteLine($"Using target languages: {string.Join(", ", languageCodes)}.");
@@ -77,7 +74,7 @@ public class Translator
                 return language.Code;
             }
         }
-        throw new Exception($"Source language '{sourceLanguage}' not found. To see a list of supported languages, use the `list-source-languages` command.");
+        throw new TranslatorInitializationException($"Source language '{sourceLanguage}' not found. To see a list of supported languages, use the `list-source-languages` command.");
     }
 
     private DeepL.Translator CreateTranslator(string ApiKey)
@@ -112,7 +109,7 @@ public class Translator
                 }
             }
         }
-        throw new Exception($"Adapter '{adapter}' not found.");
+        throw new TranslatorInitializationException($"Adapter '{adapter}' not found.");
     }
 
     public static void ListLanguages(string ApiKey)
@@ -130,6 +127,7 @@ public class Translator
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error listing languages: {ex.Message}");
+            Environment.Exit(1);
         }
     }
 
@@ -148,6 +146,7 @@ public class Translator
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error listing languages: {ex.Message}");
+            Environment.Exit(1);
         }
     }
 }

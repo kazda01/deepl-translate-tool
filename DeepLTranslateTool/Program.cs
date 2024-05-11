@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using CommandLine.Text;
+using DeepLTranslateTool.Exceptions;
 
 namespace DeepLTranslateTool;
 
@@ -74,22 +75,31 @@ class Program
         try
         {
             translator = new Translator(options);
+            translator.Translate();
         }
-        catch (Exception ex)
+        catch (TranslationException ex)
+        {
+            Console.Error.WriteLine($"Error translating text:: {ex.Message}");
+            Environment.Exit(1);
+            return;
+        }
+        catch (TranslatorInitializationException ex)
         {
             Console.Error.WriteLine($"Error initializing translator: {ex.Message}");
             Environment.Exit(1);
             return;
         }
-
-        try
+        catch (AdapterException ex)
         {
-            translator.Translate();
+            Console.Error.WriteLine($"Error in adapter: {ex.Message}");
+            Environment.Exit(1);
+            return;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error translating text: {ex.Message}");
+            Console.Error.WriteLine($"Unknown Error: {ex.Message}");
             Environment.Exit(1);
+            return;
         }
     }
 }

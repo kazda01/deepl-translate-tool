@@ -1,3 +1,4 @@
+using DeepLTranslateTool.Exceptions;
 using DeepLTranslateTool.Models;
 
 namespace DeepLTranslateTool.Adapters;
@@ -9,42 +10,36 @@ public class PlaintextAdapter : IAdapter
     public string InputFile { get; set; } = "input.txt";
     public string SourceLanguage { get; set; } = "en";
 
-    public IEnumerable<TranslationQuery> ParseInput(out bool success)
+    public IEnumerable<TranslationQuery> ParseInput()
     {
-        success = false;
-
         if (!File.Exists(System.IO.Path.Combine(Path, InputFile)))
         {
-            Console.Error.WriteLine($"Input file '{InputFile}' not found in path '{Path}'.");
-            return Enumerable.Empty<TranslationQuery>();
+            throw new AdapterException($"Input file '{InputFile}' not found in path '{Path}'.");
         }
 
         try
         {
             var lines = File.ReadAllLines(System.IO.Path.Combine(Path, InputFile));
-            var queries = new HashSet<TranslationQuery>();
+            var queries = new List<TranslationQuery>();
 
             foreach (var line in lines)
             {
                 queries.Add(new TranslationQuery(line, SourceLanguage));
             }
 
-            success = true;
             return queries;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error reading input file: {ex.Message}");
-            return Enumerable.Empty<TranslationQuery>();
+            throw new AdapterException($"Error reading input file '{InputFile}'.", ex);
         }
     }
 
-    public bool WriteOutput(IEnumerable<TranslationResult> results)
+    public void WriteOutput(IEnumerable<TranslationResult> results)
     {
         if (!results.Any())
         {
-            Console.Error.WriteLine("No translation results to write.");
-            return false;
+            throw new AdapterException("No translation results to write.");
         }
 
         foreach (var group in results.GroupBy(r => r.Language))
@@ -57,11 +52,8 @@ public class PlaintextAdapter : IAdapter
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error writing output file '{outputFile}': {ex.Message}");
-                return false;
+                throw new AdapterException($"Error writing output file '{outputFile}'.", ex);
             }
         }
-
-        return true;
     }
 }

@@ -1,4 +1,5 @@
 using DeepLTranslateTool.Models;
+using DeepLTranslateTool.Exceptions;
 
 namespace DeepLTranslateTool.Adapters;
 
@@ -27,14 +28,14 @@ public interface IAdapter
     /// <summary>
     /// Parses the input and returns a collection of TranslationQuery objects.
     /// </summary>
-    /// <param name="success">An out parameter indicating whether the parsing was successful.</param>
     /// <returns>A collection of TranslationQuery objects.</returns>
-    IEnumerable<TranslationQuery> ParseInput(out bool success);
+    /// <exception cref="AdapterException">Thrown when an error occurs during parsing.</exception>
+    IEnumerable<TranslationQuery> ParseInput();
 
     /// <summary>
     /// Writes the output of the translation results.
     /// </summary>
     /// <param name="results">The collection of translation results.</param>
-    /// <returns>A boolean value indicating whether the write operation was successful.</returns>
-    bool WriteOutput(IEnumerable<TranslationResult> results);
+    /// <exception cref="AdapterException">Thrown when an error occurs during writing.</exception>
+    void WriteOutput(IEnumerable<TranslationResult> results);
 }
