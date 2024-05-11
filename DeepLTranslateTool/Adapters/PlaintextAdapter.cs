@@ -3,12 +3,10 @@ using DeepLTranslateTool.Models;
 
 namespace DeepLTranslateTool.Adapters;
 
-public class PlaintextAdapter : IAdapter
+public class PlaintextAdapter : AbstractAdapter, IAdapter
 {
     public string Handle => "plaintext";
-    public string Path { get; set; } = Environment.CurrentDirectory;
     public string InputFile { get; set; } = "input.txt";
-    public string SourceLanguage { get; set; } = "en";
 
     public List<TranslationQuery> ParseInput()
     {
@@ -35,12 +33,9 @@ public class PlaintextAdapter : IAdapter
         }
     }
 
-    public void WriteOutput(IEnumerable<TranslationResult> results)
+    public new void WriteOutput(IEnumerable<TranslationResult> results)
     {
-        if (!results.Any())
-        {
-            throw new AdapterException("No translation results to write.");
-        }
+        base.WriteOutput(results);
 
         foreach (var group in results.GroupBy(r => r.Language))
         {

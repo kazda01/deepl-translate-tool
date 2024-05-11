@@ -100,6 +100,7 @@ public class Translator
                     _output.WriteLine($"Using adapter '{adapter}'.", true);
                     if (options.InputFile != null)
                         instance.InputFile = options.InputFile;
+                    instance.Path = options.Path;
                     return instance;
                 }
             }
