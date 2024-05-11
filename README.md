@@ -14,7 +14,7 @@ This tool is using Adapters to parse queries from input files and then save resu
 
 ### Currently supported Adapters
 - plaintext
-- Yii2
+- php-yii2
 
 ## Getting Started
 
