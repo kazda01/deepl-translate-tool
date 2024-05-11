@@ -20,12 +20,15 @@ public class Yii2Adapter : AbstractAdapter, IAdapter
         {
             var fileContent = File.ReadAllText(System.IO.Path.Combine(Path, InputFile));
 
-            MatchCollection matches = Regex.Matches(fileContent, @"\s*['""](?<key>[^'""]+)['""]\s*=>\s*['""](?<value>[^'""]+)['""](?:\s*,\s*|\s*)");
+            MatchCollection matches = Regex.Matches(fileContent, @"\s*(?<key>['""].+['""])\s*=>.*");
             var queries = new List<TranslationQuery>();
 
             foreach (Match match in matches)
             {
                 string query = match.Groups["key"].Value;
+                // Removes escaping of any quotes
+                char quote = query[0];
+                query = query.Substring(1, query.Length - 2).Replace("\\" + quote, quote.ToString());
                 queries.Add(new TranslationQuery(query, SourceLanguage));
             }
 
@@ -47,7 +50,8 @@ public class Yii2Adapter : AbstractAdapter, IAdapter
             {
                 Directory.CreateDirectory(System.IO.Path.Combine(Path, $"{group.Key}"));
             }
-            var outputFile = System.IO.Path.Combine(Path, $"{group.Key}", InputFile);
+            var inputFileName = System.IO.Path.GetFileName(InputFile);
+            var outputFile = System.IO.Path.Combine(Path, $"{group.Key}", inputFileName);
 
             try
             {
