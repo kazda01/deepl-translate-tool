@@ -43,7 +43,7 @@ public class PlaintextAdapter : AbstractAdapter, IAdapter
 
             try
             {
-                File.WriteAllLines(outputFile, group.Select(r => r.Text));
+                File.WriteAllLines(outputFile, group.Select(r => r.Translation));
             }
             catch (Exception ex)
             {

@@ -40,13 +40,13 @@ public class TranslationService
 
                 if (_cache != null && _cache.TryGet(key, out string? cachedResult) && cachedResult != null)
                 {
-                    results[i] = new TranslationResult(cachedResult, targetLanguage);
+                    results[i] = new TranslationResult(query.Text,cachedResult, targetLanguage);
                     Interlocked.Increment(ref resultsFromCache);
                 }
                 else
                 {
                     string translation = _translator.TranslateTextAsync(query.Text, _sourceLanguage, targetLanguage).Result.ToString();
-                    results[i] = new TranslationResult(translation, targetLanguage);
+                    results[i] = new TranslationResult(query.Text, translation, targetLanguage);
                     _cache?.Set(key, translation);
                 }
             }
