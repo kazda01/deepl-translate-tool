@@ -67,13 +67,26 @@ class Program
 
     private static void Run(TranslateOptions options)
     {
+        Translator translator;
         try
         {
-            var translator = new Translator(options);
+            translator = new Translator(options);
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error initializing translator: {ex.Message}");
+            Environment.Exit(1);
+            return;
+        }
+
+        try
+        {
+            translator.Translate();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error translating text: {ex.Message}");
+            Environment.Exit(1);
         }
     }
 }

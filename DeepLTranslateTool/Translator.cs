@@ -1,14 +1,15 @@
 using DeepLTranslateTool.Adapters;
+using DeepLTranslateTool.Models;
 
 namespace DeepLTranslateTool;
 
 public class Translator
 {
-    private IAdapter? _adapter;
+    private readonly IAdapter _adapter;
     private readonly bool _verbose;
     private readonly string _sourceLanguage;
     private readonly DeepL.Translator _translator;
-    private IEnumerable<string> _languages = Enumerable.Empty<string>();
+    private readonly IEnumerable<string> _languages = Enumerable.Empty<string>();
 
     public Translator(TranslateOptions options)
     {
@@ -19,6 +20,24 @@ public class Translator
         _languages = ParseLanguages(options.Languages).Result;
     }
 
+    public void Translate()
+    {
+        var queries = _adapter.ParseInput(out var success);
+        if(_verbose)
+            Console.WriteLine($"Parsed {queries.Count()} queries from input file.");
+        if (!success)
+            return;
+
+        var results = new List<TranslationResult>();
+        Console.WriteLine($"Translated {results.Count} queries to {_languages.Count()} languages.");
+
+        if (_adapter.WriteOutput(results))
+        {
+            if (_verbose)
+                Console.WriteLine("Translation complete.");
+        }
+    }
+
     private async Task<IEnumerable<string>> ParseLanguages(IEnumerable<string> languages)
     {
         var supportedLanguages = await _translator.GetTargetLanguagesAsync();
@@ -26,21 +45,19 @@ public class Translator
 
         foreach (var language in languages)
         {
-            var languageCode = language.ToLower();
-            foreach (var supportedLanguage in supportedLanguages)
+            if(supportedLanguages.Any(l => l.Code.ToLower() == language.ToLower()))
             {
-                if (supportedLanguage.Code == languageCode)
-                {
-                    languageCodes.Add(languageCode);
-                }
+                languageCodes.Add(language);
+                continue;
             }
+            throw new Exception($"Target language '{language}' not found. To see a list of supported languages, use the `list-languages` command.");
         }
 
         if (!languageCodes.Any())
             throw new Exception("No valid target languages found. To see a list of supported languages, use the `list-languages` command.");
 
         if (_verbose)
-            Console.WriteLine($"Using target languages: {string.Join(", ", languageCodes)}");
+            Console.WriteLine($"Using target languages: {string.Join(", ", languageCodes)}.");
 
         return languageCodes;
     }
@@ -51,11 +68,11 @@ public class Translator
         var languages = await _translator.GetSourceLanguagesAsync();
         foreach (var language in languages)
         {
-            if (language.Code == sourceLanguage)
+            if (language.Code.ToLower() == sourceLanguage)
             {
                 if (_verbose)
-                    Console.WriteLine($"Using source language '{language.Name}' ({language.Code}).");
-                return sourceLanguage;
+                    Console.WriteLine($"Using source language {language.Code}.");
+                return language.Code;
             }
         }
         throw new Exception($"Source language '{sourceLanguage}' not found. To see a list of supported languages, use the `list-source-languages` command.");
