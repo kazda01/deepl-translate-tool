@@ -30,7 +30,7 @@ public interface IAdapter
     /// </summary>
     /// <returns>A collection of TranslationQuery objects.</returns>
     /// <exception cref="AdapterException">Thrown when an error occurs during parsing.</exception>
-    IEnumerable<TranslationQuery> ParseInput();
+    List<TranslationQuery> ParseInput();
 
     /// <summary>
     /// Writes the output of the translation results.

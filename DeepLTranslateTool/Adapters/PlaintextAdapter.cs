@@ -10,7 +10,7 @@ public class PlaintextAdapter : IAdapter
     public string InputFile { get; set; } = "input.txt";
     public string SourceLanguage { get; set; } = "en";
 
-    public IEnumerable<TranslationQuery> ParseInput()
+    public List<TranslationQuery> ParseInput()
     {
         if (!File.Exists(System.IO.Path.Combine(Path, InputFile)))
         {

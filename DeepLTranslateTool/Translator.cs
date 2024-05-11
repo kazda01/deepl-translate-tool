@@ -1,7 +1,7 @@
 using DeepLTranslateTool.Adapters;
 using DeepLTranslateTool.Exceptions;
-using DeepLTranslateTool.Models;
 using DeepLTranslateTool.Output;
+using DeepLTranslateTool.Services;
 
 namespace DeepLTranslateTool;
 
@@ -12,6 +12,7 @@ public class Translator
     private readonly string _sourceLanguage;
     private readonly DeepL.Translator _translator;
     private readonly IEnumerable<string> _languages = Enumerable.Empty<string>();
+    private readonly bool _cache = true;
 
     public Translator(TranslateOptions options)
     {
@@ -20,6 +21,7 @@ public class Translator
         _translator = CreateTranslator(options.ApiKey);
         _sourceLanguage = ParseSourceLanguage(options.SourceLanguage).Result;
         _languages = ParseLanguages(options.Languages).Result;
+        _cache = !options.NoCache;
     }
 
     public void Translate()
@@ -27,9 +29,9 @@ public class Translator
         var queries = _adapter.ParseInput();
         _output.WriteLine($"Parsed {queries.Count()} queries from input file.", true);
 
-        var results = new List<TranslationResult>();
-        // TODO: Implement translation logic
-        _output.WriteLine($"Translated {results.Count} queries to {_languages.Count()} languages.", true);
+        var translationService = new TranslationService(_translator, _sourceLanguage, _output, _cache);
+        var results = translationService.TranslateQueries(queries, _languages);
+        _output.WriteLine($"Translated {results.Count} queries to {_languages.Count()} languages.");
 
         _adapter.WriteOutput(results);
         _output.WriteLine("Translation complete.", true);

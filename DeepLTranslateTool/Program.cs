@@ -22,6 +22,9 @@ public class TranslateOptions
     [Option('i', "input-file", HelpText = "Input file to translate. If not specified, input file is defined by choosen adapter.")]
     public string? InputFile { get; set; }
 
+    [Option("no-cache", HelpText = "Whether to disable caching of translation results. Caching is enabled by default and queries are cached for 1 month", Default = false)]
+    public bool NoCache { get; set; }
+
     [Option('v', "verbose", Default = false, HelpText = "Print verbose output.")]
     public bool Verbose { get; set; }
 }
