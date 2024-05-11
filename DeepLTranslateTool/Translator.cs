@@ -14,7 +14,7 @@ public class Translator
     public Translator(TranslateOptions options)
     {
         _verbose = options.Verbose;
-        _adapter = ParseAdapter(options.Adapter);
+        _adapter = ParseAdapter(options.Adapter, options);
         _translator = CreateTranslator(options.ApiKey);
         _sourceLanguage = ParseSourceLanguage(options.SourceLanguage).Result;
         _languages = ParseLanguages(options.Languages).Result;
@@ -23,13 +23,15 @@ public class Translator
     public void Translate()
     {
         var queries = _adapter.ParseInput(out var success);
-        if(_verbose)
+        if (_verbose)
             Console.WriteLine($"Parsed {queries.Count()} queries from input file.");
         if (!success)
             return;
 
         var results = new List<TranslationResult>();
-        Console.WriteLine($"Translated {results.Count} queries to {_languages.Count()} languages.");
+        // TODO: Implement translation logic
+        if (_verbose)
+            Console.WriteLine($"Translated {results.Count} queries to {_languages.Count()} languages.");
 
         if (_adapter.WriteOutput(results))
         {
@@ -45,7 +47,7 @@ public class Translator
 
         foreach (var language in languages)
         {
-            if(supportedLanguages.Any(l => l.Code.ToLower() == language.ToLower()))
+            if (supportedLanguages.Any(l => l.Code.ToLower() == language.ToLower()))
             {
                 languageCodes.Add(language);
                 continue;
@@ -90,7 +92,7 @@ public class Translator
         return translator;
     }
 
-    private IAdapter ParseAdapter(string adapter)
+    private IAdapter ParseAdapter(string adapter, TranslateOptions options)
     {
         adapter = adapter.ToLower();
         var adapterType = typeof(IAdapter);
@@ -104,6 +106,8 @@ public class Translator
                 {
                     if (_verbose)
                         Console.WriteLine($"Using adapter '{adapter}'.");
+                    if (options.InputFile != null)
+                        instance.InputFile = options.InputFile;
                     return instance;
                 }
             }

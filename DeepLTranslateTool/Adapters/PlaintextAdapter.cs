@@ -30,7 +30,6 @@ public class PlaintextAdapter : IAdapter
             }
 
             success = true;
-            Console.WriteLine("Success");
             return queries;
         }
         catch (Exception ex)

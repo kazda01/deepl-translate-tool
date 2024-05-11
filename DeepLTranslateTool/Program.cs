@@ -18,6 +18,9 @@ public class TranslateOptions
     [Option('l', "languages", HelpText = "Languages to translate to, separated by space.", Default = new[] { "en" })]
     public IEnumerable<string> Languages { get; set; } = new[] { "en" };
 
+    [Option('i', "input-file", HelpText = "Input file to translate. If not specified, input file is defined by choosen adapter.")]
+    public string? InputFile { get; set; }
+
     [Option('v', "verbose", Default = false, HelpText = "Print verbose output.")]
     public bool Verbose { get; set; }
 }
