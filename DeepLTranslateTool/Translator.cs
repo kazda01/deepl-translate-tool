@@ -1,20 +1,21 @@
 using DeepLTranslateTool.Adapters;
 using DeepLTranslateTool.Exceptions;
 using DeepLTranslateTool.Models;
+using DeepLTranslateTool.Output;
 
 namespace DeepLTranslateTool;
 
 public class Translator
 {
     private readonly IAdapter _adapter;
-    private readonly bool _verbose;
+    private readonly IOutput _output;
     private readonly string _sourceLanguage;
     private readonly DeepL.Translator _translator;
     private readonly IEnumerable<string> _languages = Enumerable.Empty<string>();
 
     public Translator(TranslateOptions options)
     {
-        _verbose = options.Verbose;
+        _output = new ConsoleOutput { Verbose = options.Verbose };
         _adapter = ParseAdapter(options.Adapter, options);
         _translator = CreateTranslator(options.ApiKey);
         _sourceLanguage = ParseSourceLanguage(options.SourceLanguage).Result;
@@ -24,17 +25,14 @@ public class Translator
     public void Translate()
     {
         var queries = _adapter.ParseInput();
-        if (_verbose)
-            Console.WriteLine($"Parsed {queries.Count()} queries from input file.");
+        _output.WriteLine($"Parsed {queries.Count()} queries from input file.", true);
 
         var results = new List<TranslationResult>();
         // TODO: Implement translation logic
-        if (_verbose)
-            Console.WriteLine($"Translated {results.Count} queries to {_languages.Count()} languages.");
+        _output.WriteLine($"Translated {results.Count} queries to {_languages.Count()} languages.", true);
 
         _adapter.WriteOutput(results);
-        if (_verbose)
-            Console.WriteLine("Translation complete.");
+        _output.WriteLine("Translation complete.", true);
     }
 
     private async Task<IEnumerable<string>> ParseLanguages(IEnumerable<string> languages)
@@ -55,8 +53,7 @@ public class Translator
         if (!languageCodes.Any())
             throw new TranslatorInitializationException("No valid target languages found. To see a list of supported languages, use the `list-languages` command.");
 
-        if (_verbose)
-            Console.WriteLine($"Using target languages: {string.Join(", ", languageCodes)}.");
+        _output.WriteLine($"Using target languages: {string.Join(", ", languageCodes)}.", true);
 
         return languageCodes;
     }
@@ -69,8 +66,7 @@ public class Translator
         {
             if (language.Code.ToLower() == sourceLanguage)
             {
-                if (_verbose)
-                    Console.WriteLine($"Using source language {language.Code}.");
+                _output.WriteLine($"Using source language {language.Code}.", true);
                 return language.Code;
             }
         }
@@ -79,12 +75,10 @@ public class Translator
 
     private DeepL.Translator CreateTranslator(string ApiKey)
     {
-        if (_verbose)
-            Console.WriteLine("Creating translator...");
+        _output.WriteLine("Creating translator...", true);
 
         var translator = new DeepL.Translator(ApiKey);
-        if (_verbose)
-            Console.WriteLine("Translator created.");
+        _output.WriteLine("Translator created.", true);
 
         return translator;
     }
@@ -101,8 +95,7 @@ public class Translator
             {
                 if (instance.Handle == adapter)
                 {
-                    if (_verbose)
-                        Console.WriteLine($"Using adapter '{adapter}'.");
+                    _output.WriteLine($"Using adapter '{adapter}'.", true);
                     if (options.InputFile != null)
                         instance.InputFile = options.InputFile;
                     return instance;
