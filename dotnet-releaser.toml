@@ -1,0 +1,10 @@
+# configuration file for dotnet-releaser
+[msbuild]
+project = "deepl-translate-tool.sln"
+[github]
+user = "kazda01"
+repo = "deepl-translate-tool"
+version_prefix = "v"
+branches = ["main"]
+[nuget]
+publish = false
