@@ -16,7 +16,7 @@ public class TranslateOptions
     [Option('s', "source-language", HelpText = "Source language for translation.", Default = "en")]
     public string SourceLanguage { get; set; } = "en";
 
-    [Option('l', "languages", HelpText = "Languages to translate to, separated by space.", Default = new[] { "en" })]
+    [Option('l', "languages", HelpText = "Languages to translate to, separated by space.", Default = new[] { "cs", "fr" })]
     public IEnumerable<string> Languages { get; set; } = new[] { "en" };
 
     [Option('i', "input-file", HelpText = "Input file to translate. If not specified, input file is defined by choosen adapter.")]
