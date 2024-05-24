@@ -8,3 +8,5 @@ version_prefix = "v"
 branches = ["main"]
 [nuget]
 publish = false
+[brew]
+publish = false
