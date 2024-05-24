@@ -133,7 +133,7 @@ public class Translator
         {
             var translator = new DeepL.Translator(ApiKey);
             var languages = translator.GetSourceLanguagesAsync().Result;
-            Console.WriteLine("Supported target languages:");
+            Console.WriteLine("Supported source languages:");
             foreach (var language in languages)
             {
                 Console.WriteLine($" - {language.Name} ({language.Code})");
