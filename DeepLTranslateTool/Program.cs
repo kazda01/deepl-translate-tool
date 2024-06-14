@@ -30,6 +30,22 @@ public class TranslateOptions
 
     [Option('v', "verbose", Default = false, HelpText = "Print verbose output.")]
     public bool Verbose { get; set; }
+
+    public TranslateOptions(string apiKey, string adapter, string sourceLanguage, IEnumerable<string> languages, string? inputFile, string path, bool noCache, bool verbose)
+    {
+        ApiKey = apiKey;
+        Adapter = adapter;
+        SourceLanguage = sourceLanguage;
+        Languages = languages;
+        InputFile = inputFile;
+        Path = path;
+        NoCache = noCache;
+        Verbose = verbose;
+    }
+
+    public TranslateOptions()
+    {
+    }
 }
 
 [Verb("list-languages", HelpText = "List supported target languages.")]
@@ -37,6 +53,11 @@ public class ListLanguagesOptions
 {
     [Option("api-key", HelpText = "DeepL API authentication key.", Required = true)]
     public string ApiKey { get; set; } = string.Empty;
+
+    public ListLanguagesOptions(string apiKey)
+    {
+        ApiKey = apiKey;
+    }
 }
 
 [Verb("list-source-languages", HelpText = "List supported source languages.")]
@@ -44,6 +65,11 @@ public class ListSourceLanguagesOptions
 {
     [Option("api-key", HelpText = "DeepL API authentication key.", Required = true)]
     public string ApiKey { get; set; } = string.Empty;
+
+    public ListSourceLanguagesOptions(string apiKey)
+    {
+        ApiKey = apiKey;
+    }
 }
 
 class Program
